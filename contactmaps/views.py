@@ -27,20 +27,21 @@ __docformat__ = 'epytext en'
 import copy
 import urllib2
 
+from contactmaps import settings
+from contactmaps.app import get_geoinfo, store_city_from_contact
+from contactmaps.forms import ContactForm
+from contactmaps.lib import freshbooks
+from contactmaps.models import City, Contact, ContactmapsImport
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, RequestContext
-from django.views.generic.list_detail import object_list, object_detail
+from django.views.generic.list_detail import object_detail
 from django.views.generic.create_update import create_object, delete_object, \
      update_object
 from google.appengine.api import users, urlfetch
 from google.appengine.ext import db
-from contactmaps.forms import ContactForm
-from contactmaps.lib import freshbooks
-from contactmaps.models import City, Contact, ContactmapsImport
-from contactmaps.app import get_geoinfo, store_city_from_contact
 from ragendja.auth.views import google_logout
 from ragendja.template import render_to_response
 
@@ -89,27 +90,29 @@ def list_contacts(request):
     that the current contacts live in and the geographical postion
     of those cities.
     """
-    PAGINATE_BY = 20 # TODO: this constant must be moved to settings.py 
-    
     # Set up the contacts query
-    contacts = Contact.all().filter("owner =", users.get_current_user()).order('creation_date')
+    contacts = (
+        Contact.all().
+        filter("owner =", users.get_current_user()).
+        order('creation_date')
+    )
     
     # Paginate using django's pagination tools
-    paginator = Paginator(contacts, PAGINATE_BY)
+    paginator = Paginator(contacts, settings.PAGINATE_BY)
     page = request.GET.get('page', 1)
     try:
-      page_number = int(page)
+        page_number = int(page)
     except ValueError:
-      if page == 'last':
-        page_number = paginator.num_pages
-      else:
-        # Page is not 'last', nor can it be converted to an int.
-        raise Http404
+        if page == 'last':
+            page_number = paginator.num_pages
+        else:
+            # Page is not 'last', nor can it be converted to an int.
+            raise Http404
     
     try:
-      page_obj = paginator.page(page_number)
+        page_obj = paginator.page(page_number)
     except InvalidPage:
-      raise Http404
+        raise Http404
     
     # Get the cities that the contacts live in
     _cities = []
@@ -212,7 +215,6 @@ def delete_contacts(request):
     This view also deletes the entities associated with the contacts
     that are being deleted.
     """
-        
     if request.method == 'POST':
         db.delete( Contact.all().filter("owner =", users.get_current_user()) )
         db.delete( ContactmapsImport.all().filter("owner =", users.get_current_user()) )
@@ -255,10 +257,7 @@ def import_contacts_setup(request, page):
         'contacts': contacts,
         'keepProcessing': keep_processing
       }
-    """
-    # Max number of contacts to fetch per page
-    CONTACTS_PER_PAGE = 500 # TODO: this must go in settings.py
-    
+    """    
     # Ensure that the username and token are valid
     username = request.POST.get('username')
     token = request.POST.get('token')
@@ -274,7 +273,16 @@ def import_contacts_setup(request, page):
     
     # Get the client_ids of the Contacts to import. This is done using paging
     # to overcome AppEngine restrictions
-    options = {'per_page': CONTACTS_PER_PAGE, 'page': int(page)}
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+    
+    options = {
+        'per_page': settings.IMPORT_SETUP_CONTACTS_PER_PAGE,
+        'page': int(page)
+    }
+    
     try:
         contacts = [c.client_id for c in freshbooks.Client.list(options)]
     except urlfetch.DownloadError:
@@ -289,7 +297,7 @@ def import_contacts_setup(request, page):
         if error.code == 401:
             error_msg = 'Invalid username/token'
         else:
-            error_msg = 'Connection to Freshbooks refused'
+            error_msg = 'Connection to Freshbooks failed'
         
         return HttpResponse(
             json.dumps({
@@ -407,10 +415,13 @@ def import_contacts(request):
         )
         contact.put()
         
-        # Add a task in order to calculated the contact's geoinfo
+        # Add a task in order to calculate the contact's geoinfo
+        # This uses AppEngine Task Queues.
         try:
             taskqueue.add(url='/contact-geo-info/', params={'key': contact.key()})
         except TransientError:
+            # Sometimes a weird TransientError is thrown by the API, so retrying
+            # might recover from that.
             taskqueue.add(url='/contact-geo-info/', params={'key': contact.key()})
     
     return HttpResponse(
