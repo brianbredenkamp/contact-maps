@@ -15,12 +15,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""
+ContactMaps form to add and edit Contacts. This module uses django forms.
+
+@todo: Recalculate geoinfo when a Contact is edited
+"""
+__docformat__ = 'epytext en'
+
+
+###############################################################################
+## Imports
+###############################################################################
 from django import forms
 from contactmaps.app import get_geoinfo, store_city_from_contact
 from contactmaps.models import Contact
 from google.appengine.api import users
 from google.appengine.ext import db
 
+###############################################################################
+## Forms
+###############################################################################
 class ContactForm(forms.ModelForm):
     def save(self):
         """

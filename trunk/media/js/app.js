@@ -155,6 +155,7 @@ Copyright (c) 2009 GOcipher.
 
 /*** end maps section ***/
 
+/*** Contacts Import ***/
 	// Freshbooks import
 	$(function() {
 		$("#freshbooks-import").dialog({
@@ -344,6 +345,7 @@ Copyright (c) 2009 GOcipher.
 		$("#freshbooks-import-progressbar").progressbar();
 		
 	});
+	/*** End Import Contacts Section ***/
 
 	/*** Function called when the document is loaded, it initialize the events (import contacts and maps painting) ***/
 	$(function () {
@@ -395,4 +397,3 @@ Copyright (c) 2009 GOcipher.
 				jQuery("#contact-listing").addRowData(i+1, contacts[i]);
 		}
 	});
-/*** End Import Contacts Section ***/

@@ -15,8 +15,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""
+Automatic URL patterns file. This file is used by app-engine-patch.
+"""
+__docformat__ = 'epytext en'
+
+
+###############################################################################
+## Imports
+###############################################################################
 from django.conf.urls.defaults import *
 
+###############################################################################
+## Automatic URL patterns
+###############################################################################
 rootpatterns = patterns('',
     (r'^contacts/', include('contactmaps.urls')),
 )
