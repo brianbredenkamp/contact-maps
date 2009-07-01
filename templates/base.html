@@ -74,9 +74,9 @@
 			<div id="header" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
 				<div id="header-content" class="ui-widget-header ui-helper-reset ui-helper-clearfix ui-corner-all">
 						<div id="header-links">
-							<a href="/" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-home"></span>Home</a>
+							<a href="{% url contactmaps.views.index %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-home"></span>Home</a>
 							<a href="{% url contactmaps.views.list_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-person"></span>Contacts &amp; Maps</a>
-							<a href="#" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-info"></span>About</a>
+							<a href="{% url contactmaps.views.about %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-info"></span>About</a>
 						</div>
 						<div id="login-info">
 							{% if user.is_authenticated %}

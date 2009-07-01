@@ -15,6 +15,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""
+Functions that the ContactMaps app needs in order to work. Currently 
+there are only geoinfo functions.
+"""
+__docformat__ = 'epytext en'
+
+
+###############################################################################
+## Imports
+###############################################################################
 import urllib2
 import urllib
 
@@ -26,6 +36,9 @@ try:
 except ImportError:
   from django.utils import simplejson as json
 
+###############################################################################
+## App Functions
+###############################################################################
 def get_geoinfo(query):
     """
     This function queries the GoogleMaps Geocoding server,
@@ -34,6 +47,8 @@ def get_geoinfo(query):
     
     If no info was found for the query, this function returns
     None
+    
+    @todo: move GOOGLE_MAPS_KEY to settings.py
     """
     GOOGLE_MAPS_API_URL = "http://maps.google.com/maps/geo?"
     GOOGLE_MAPS_KEY = 'ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA'

@@ -15,8 +15,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""
+URLConf file.
+"""
+__docformat__ = 'epytext en'
+
+
+###############################################################################
+## Imports
+###############################################################################
 from django.conf.urls.defaults import *
 
+###############################################################################
+## URL patterns
+###############################################################################
 urlpatterns = patterns('contactmaps.views',
     (r'^$', 'list_contacts'),
     (r'^add/$', 'add_contact'),

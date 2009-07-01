@@ -14,18 +14,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+"""
+Views file.
+"""
+__docformat__ = 'epytext en'
+
+
+###############################################################################
+## Imports
+###############################################################################
+import copy
 import urllib2
 
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, InvalidPage
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, RequestContext
 from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.create_update import create_object, delete_object, \
      update_object
-from gaegene.pagination.models import Paginator, Page
-from google.appengine.api import users
-from google.appengine.api import urlfetch
+from google.appengine.api import users, urlfetch
 from google.appengine.ext import db
 from contactmaps.forms import ContactForm
 from contactmaps.lib import freshbooks
@@ -51,6 +61,10 @@ def index(request):
     """This view just displays the welcome page"""
     return render_to_response(request, 'main.html')
 
+def about(request):
+    """This view shows the about section"""
+    return render_to_response(request, 'about.html')
+
 @login_required
 def logout(request):
     """This view logs the user out from google."""
@@ -74,21 +88,32 @@ def list_contacts(request):
     The list of contacts. This view also fetches the cities
     that the current contacts live in and the geographical postion
     of those cities.
-    
-    It uses the gaegene library for pagination.
     """
-    PAGINATE_BY = 20
+    PAGINATE_BY = 20 # TODO: this constant must be moved to settings.py 
+    
+    # Set up the contacts query
     contacts = Contact.all().filter("owner =", users.get_current_user()).order('creation_date')
     
-    # Paginate
-    paginator = Paginator(contacts, 'creation_date', per_page=PAGINATE_BY)
-    page_value = request.GET.get('page')
-    page = paginator.page(page_value)
-    paginated_contacts = page.object_list
+    # Paginate using django's pagination tools
+    paginator = Paginator(contacts, PAGINATE_BY)
+    page = request.GET.get('page', 1)
+    try:
+      page_number = int(page)
+    except ValueError:
+      if page == 'last':
+        page_number = paginator.num_pages
+      else:
+        # Page is not 'last', nor can it be converted to an int.
+        raise Http404
+    
+    try:
+      page_obj = paginator.page(page_number)
+    except InvalidPage:
+      raise Http404
     
     # Get the cities that the contacts live in
     _cities = []
-    for contact in paginated_contacts:
+    for contact in copy.deepcopy(page_obj.object_list):
         _cities.append(contact.city)
     cities = set(_cities)
     
@@ -109,12 +134,35 @@ def list_contacts(request):
                 'longitude': city.location.lon
             })
     
-    return object_list(
-        request,
-        contacts,
-        paginate_by=PAGINATE_BY,
-        extra_context={'cities_list': cities_list}
-    )
+    # Create the context and render the template with pagination
+    # This part is adapted from django.views.generic.list_detail.oject_list
+    context = RequestContext(request, {
+        'object_list': page_obj.object_list,
+        'paginator': paginator,
+        'page_obj': page_obj,
+
+        # Legacy template context stuff. New templates should use page_obj
+        # to access this instead.
+        'is_paginated': page_obj.has_other_pages(),
+        'results_per_page': paginator.per_page,
+        'has_next': page_obj.has_next(),
+        'has_previous': page_obj.has_previous(),
+        'page': page_obj.number,
+        'next': page_obj.next_page_number(),
+        'previous': page_obj.previous_page_number(),
+        'first_on_page': page_obj.start_index(),
+        'last_on_page': page_obj.end_index(),
+        'pages': paginator.num_pages,
+        'hits': paginator.count,
+        'page_range': paginator.page_range,
+        
+        # The cities list
+        'cities_list': cities_list
+    })
+    template = loader.get_template('contact_list.html')
+    
+    # Return the rendered template
+    return HttpResponse(template.render(context))
 
 @login_required
 def add_contact(request):
@@ -179,10 +227,37 @@ def delete_contacts(request):
 @login_required
 def import_contacts_setup(request, page):
     """
+    This view is in charge of fetching freshbooks ids of clients 
+    from a freshbooks account.
+    
+    It returns those ids to the frontend app, which in turn initiates 
+    a series of ajax calls to import each and every id that this
+    view has returned.
+    
+    This view is also called in a 'paging' way to overcome the
+    30-seconds-max-per-request AppEngine limitation.
+    
+    It receives the following parameters via POST:
+      - username: the freshbooks username
+      - token: the freshbooks token
+    
+    In case of failure, this view returns a json response like
+    the following::
+      {
+        'success': False,
+        'error': 'error msg',
+        'retry': True| False (Whether the frontend app should retry)    
+      }
+    
+    In case of success, this view returns the followin json response::
+      {
+        'success': True,
+        'contacts': contacts,
+        'keepProcessing': keep_processing
+      }
     """
-    # TODO: this must go in settings.py
     # Max number of contacts to fetch per page
-    CONTACTS_PER_PAGE = 500
+    CONTACTS_PER_PAGE = 500 # TODO: this must go in settings.py
     
     # Ensure that the username and token are valid
     username = request.POST.get('username')
@@ -214,7 +289,7 @@ def import_contacts_setup(request, page):
         if error.code == 401:
             error_msg = 'Invalid username/token'
         else:
-            error_msg = 'Connection to Freshmaps refused'
+            error_msg = 'Connection to Freshbooks refused'
         
         return HttpResponse(
             json.dumps({
@@ -249,6 +324,24 @@ def import_contacts_setup(request, page):
 @login_required
 def import_contacts(request):
     """
+    This view is called in a by the frontend app in oder to import
+    contacts.
+    
+    It receives the following parameters via POST:
+      - username: the freshbooks username
+      - token: the freshbooks token
+      - contacts: the list of id of freshbooks clients to import as a json obj
+      - finalize: whether the import process must be finalized
+    
+    If there is some sort of error, this view returns a json response 
+    like the following:: 
+      {
+        'success': False,
+        'error': 'error msg' 
+      }
+    
+    @todo: Checking if clients from a freshbooks account have
+        already been imported MUST be done in the import_contacts_setup view
     """
     # Ensure that the username and token are valid
     username = request.POST.get('username')
@@ -331,6 +424,11 @@ def import_contacts(request):
 ###############################################################################
 def get_contact_geoinfo(request):
     """
+    This is the Task Queue worker that calculates geographical 
+    information from contacts.
+    
+    This worker receives a 'key' POST parameter, which is the 
+    key of the entity to calculate the geoinfo for.
     """
     # Ensure that the key parameter is present
     key = request.POST.get('key')
@@ -342,7 +440,7 @@ def get_contact_geoinfo(request):
             })
         )
     
-    # Get the contact entity usgin the input key
+    # Get the contact entity using the input key
     contact = Contact.get(key)
     if contact is None:
         return HttpResponse(
