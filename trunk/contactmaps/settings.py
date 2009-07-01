@@ -30,3 +30,15 @@ locally (offline) or in a production-like environment"""
 USE_JS_CDN = True and not LOCALDEV
 """If this setting is true, jquery and jquery ui will be fetched
 from the google ajax apis CDN"""
+
+PAGINATE_BY = 20
+"""This setting states how many contacts to show in each page of 
+the Contact List"""
+
+IMPORT_SETUP_CONTACTS_PER_PAGE = 500
+"""This determines how many Freshbooks client ids to fecth per 
+request. AppEngine applications have a 30 second request limit 
+so this setting permits avoid request errors"""
+
+GOOGLE_MAPS_KEY = 'ABQIAAAA3LHzdmECuV8KC0ABupgtsRTQ3Oe6hoUSmR6N8-23Kt61mIn_uRQX_xMeg4U7UNMd4r5Mhi1BWxrjNg'
+"""The key to use when interacting with the Google Maps API"""

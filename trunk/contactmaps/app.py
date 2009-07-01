@@ -28,6 +28,7 @@ __docformat__ = 'epytext en'
 import urllib2
 import urllib
 
+from contactmaps import settings
 from contactmaps.models import City
 from google.appengine.ext import db
 
@@ -47,11 +48,8 @@ def get_geoinfo(query):
     
     If no info was found for the query, this function returns
     None
-    
-    @todo: move GOOGLE_MAPS_KEY to settings.py
     """
     GOOGLE_MAPS_API_URL = "http://maps.google.com/maps/geo?"
-    GOOGLE_MAPS_KEY = 'ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA'
     GOOGLE_MAPS_SENSOR = 'false'
     GOOGLE_MAPS_OUTPUT = 'json'
     
@@ -60,7 +58,7 @@ def get_geoinfo(query):
         'q' : quoted_query,
         'output': GOOGLE_MAPS_OUTPUT,
         'oe': 'utf8',
-        'key': GOOGLE_MAPS_KEY,
+        'key': settings.GOOGLE_MAPS_KEY,
         'sensor': GOOGLE_MAPS_SENSOR
     }
     data = urllib.urlencode(values)

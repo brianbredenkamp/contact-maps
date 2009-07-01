@@ -10,10 +10,6 @@
 		<script type="text/javascript">
 			//<![CDATA[
 			{% if object_list %}var hasContacts = true;{% else %}var hasContacts = false;{% endif %}
-			/*** Objects to paint the markers on the map, eg: 
-					contacts = [{'name':'John Smith','organization':'Development Company','latitude':'39.265432','longitude':'-129.565874'},{'name':'Bill ...'},...]
-					cities = [{'name':'San Diego','latitude':'45.485432','longitude':'-134.965474'},{'name':'Portlan ...'},...]
-			 ***/
 			var contacts = [
 {% for contact in object_list %}
 				{name: '{{ contact.name|escapejs }}', organization: '{{ contact.company|escapejs }}', address: '{{ contact.address|escapejs }}', city: '{{ contact.city|escapejs }}', state: '{{ contact.state|escapejs }}', country: '{{ contact.country|escapejs }}', zip: '{{ contact.zip_code|escapejs }}', actions: '{% url contactmaps.views.show_contact key=contact.key %}@{% url contactmaps.views.edit_contact key=contact.key %}@{% url contactmaps.views.delete_contact key=contact.key %}', latitude: {% if contact.location.lat %}{{ contact.location.lat }}{% else %}null{% endif %}, longitude: {% if contact.location.lon %}{{ contact.location.lon }}{% else %}null{% endif %} } {% if not forloop.last %},{% endif %}
@@ -44,7 +40,7 @@
 		</script>
 		<script type="text/javascript" src="{{ MEDIA_URL }}js/grid.locale-en.js"></script>
 		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.jqGrid.min.js"></script>
-		<script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAA3LHzdmECuV8KC0ABupgtsRRZD37pMQ-JliEUIl6l9gVzPTSbFBRDyrxSM5HoEioHoasKuB82ver_0A&sensor=false"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2&key={{ GOOGLE_MAPS_KEY }}&sensor=false"></script>
 		<script type="text/javascript" src="{{ MEDIA_URL }}js/markermanager_packed.js"></script>
 		<script type="text/javascript" src="{{ MEDIA_URL }}js/app.js"></script>
 {% endblock %}
