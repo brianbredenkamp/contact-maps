@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Contact Details{% endblock %}
+{% block content %}
+				<div id="contact-detail" class="ui-widget ui-widget-content ui-corner-all">
+					<div class="content-toolbar">
+						<a href="{% url contactmaps.views.list_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Contacts</a>
+						<a href="{% url contactmaps.views.edit_contact key=object.key %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+						<a href="{% url contactmaps.views.delete_contact key=object.key %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-minus"></span>Delete</a>
+					</div>
+					<div class="content-form">
+						<form action="">
+							<p class="form-title">Contact Details</p>
+							<p class="form-row"><label for="id_name">Name:</label> <input type="text" class="readonly" name="name" value="{{ object.name|escape }}" readonly="readonly" id="id_name" /></p>
+							<p class="form-row"><label for="id_company">Company:</label> <input type="text" class="readonly" name="company" value="{{ object.company|escape }}" readonly="readonly" id="id_company" /></p>
+							<p class="form-row"><label for="id_address">Address:</label> <input type="text" class="readonly" name="address" value="{{ object.address|escape }}" readonly="readonly" id="id_address" /></p>
+							<p class="form-row"><label for="id_city">City:</label> <input type="text" class="readonly" name="city" value="{{ object.city|escape }}" readonly="readonly" id="id_city" /></p>
+							<p class="form-row"><label for="id_state">State:</label> <input type="text" class="readonly" name="state" value="{{ object.state|escape }}" readonly="readonly" id="id_state" /></p>
+							<p class="form-row"><label for="id_country">Country:</label> <input type="text" class="readonly" name="country" value="{{ object.country|escape }}" readonly="readonly" id="id_country" /></p>
+							<p class="form-row"><label for="id_zip_code">Zip code:</label> <input type="text" class="readonly" name="zip_code" value="{{ object.zip_code|escape }}" readonly="readonly" id="id_zip_code" /></p>
+						</form>
+					</div>
+				</div>
+{% endblock %}

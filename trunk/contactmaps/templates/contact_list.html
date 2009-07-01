@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Contacts &amp; Maps{% endblock %}
+
+{% block css %}
+{{ block.super }}
+		<link rel="stylesheet" type="text/css" media="screen" href="{{ MEDIA_URL }}css/jquery.grid/ui.jqgrid.css" />
+{% endblock css %}
+
+{% block js %}
+		<script type="text/javascript">
+			//<![CDATA[
+			{% if object_list %}var hasContacts = true;{% else %}var hasContacts = false;{% endif %}
+			/*** Objects to paint the markers on the map, eg: 
+					contacts = [{'name':'John Smith','organization':'Development Company','latitude':'39.265432','longitude':'-129.565874'},{'name':'Bill ...'},...]
+					cities = [{'name':'San Diego','latitude':'45.485432','longitude':'-134.965474'},{'name':'Portlan ...'},...]
+			 ***/
+			var contacts = [
+{% for contact in object_list %}
+				{name: '{{ contact.name|escapejs }}', organization: '{{ contact.company|escapejs }}', address: '{{ contact.address|escapejs }}', city: '{{ contact.city|escapejs }}', state: '{{ contact.state|escapejs }}', country: '{{ contact.country|escapejs }}', zip: '{{ contact.zip_code|escapejs }}', actions: '{% url contactmaps.views.show_contact key=contact.key %}@{% url contactmaps.views.edit_contact key=contact.key %}@{% url contactmaps.views.delete_contact key=contact.key %}', latitude: {% if contact.location.lat %}{{ contact.location.lat }}{% else %}null{% endif %}, longitude: {% if contact.location.lon %}{{ contact.location.lon }}{% else %}null{% endif %} } {% if not forloop.last %},{% endif %}
+{% endfor %}
+			];
+			
+			var _cities = [
+{% for city in cities_list %}
+				{name: '{{ city.name|escapejs }}', latitude: {% if city.latitude %}{{ city.latitude }}{% else %}null{% endif %}, longitude: {% if city.longitude %}{{ city.longitude }}{% else %}null{% endif %} } {% if not forloop.last %},{% endif %}
+{% endfor %}
+			];
+			
+			// Filter just the cities for contacts in this page
+			var cities = [];
+			var filteredCities = [];
+			for (var i=0, len=contacts.length; i < len; i++)
+				for (var j=0, lenCities=_cities.length; j < lenCities; j++)
+				if (contacts[i].city === _cities[j].name){
+					if (filteredCities.indexOf(_cities[j].name) === -1) {
+						cities.push(_cities[j]);
+						filteredCities.push(_cities[j].name);
+					}
+					break;
+				}
+			
+			var media_url = '{{ MEDIA_URL }}';
+			//]]>
+		</script>
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/grid.locale-en.js"></script>
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.jqGrid.min.js"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAA3LHzdmECuV8KC0ABupgtsRRZD37pMQ-JliEUIl6l9gVzPTSbFBRDyrxSM5HoEioHoasKuB82ver_0A&sensor=false"></script>
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/markermanager_packed.js"></script>
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/app.js"></script>
+{% endblock %}
+
+{% block content %}
+				<div id="contacts" class="ui-tabs">
+					<ul>
+						<li><a href="#contact-data"><span>Contacts</span></a></li>
+						<li><a href="#contact-maps"><span>Maps</span></a></li>
+					</ul>
+					<div id="contact-data" class="ui-tabs-hide">
+						{% include 'info_messages.html' %}
+						<div class="content-toolbar">
+							<a href="{% url contactmaps.views.add_contact %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-plus"></span>Add Contact</a>
+							{% if object_list %}
+							<a href="{% url contactmaps.views.delete_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-trash"></span>Delete All Contacts</a>
+							{% endif %}
+							<a href="#" id="freshbooks-import-link" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-arrowthick-1-s"></span>Import from Freshbooks</a>
+						</div>
+						{% if object_list %}
+							{% if has_previous or has_next %}
+							<div class="content-toolbar" style="height: 10px;">
+								<div class="pagination-previous">
+									{% if has_previous %}
+									<a href="{% url contactmaps.views.list_contacts %}?page={{ previous }}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-arrow-w"></span>Previous Page</a>
+									{% endif %}
+								</div>
+								<div class="pagination-next">
+									{% if has_next %}
+									<a href="{% url contactmaps.views.list_contacts %}?page={{ next }}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-arrow-e"></span>Next Page</a>
+									{% endif %}
+								</div>
+							</div>
+							{% endif %}
+						<table id="contact-listing" class="scroll" cellpadding="0" cellspacing="0"></table>
+							{% if has_previous or has_next %}
+							<div class="content-toolbar">
+								<div class="pagination-previous">
+									{% if has_previous %}
+									<a href="{% url contactmaps.views.list_contacts %}?page={{ previous }}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-arrow-w"></span>Previous Page</a>
+									{% endif %}
+								</div>
+								<div class="pagination-next">
+									{% if has_next %}
+									<a href="{% url contactmaps.views.list_contacts %}?page={{ next }}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-arrow-e"></span>Next Page</a>
+									{% endif %}
+								</div>
+							</div>
+							{% endif %}
+						{% else %}
+						<div id="no-contacts" class="info ui-state-highlight ui-corner-all"><p><span class="ui-icon ui-icon-alert"></span><strong>No Contacts </strong>added yet. You can add one by clicking the <a href="{% url contactmaps.views.add_contact %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-circle-plus"></span>Add Contact</a> button.</p></div>
+						{% endif %} 
+						
+						<div id="freshbooks-import" title="Import your Freshbooks Clients as Contacts">
+							<form action="" id="freshbooks-import-form">
+								<p><label for="username">Freshbooks Username:</label><input type="text" id="username" name="username" />.freshbooks.com</p>
+								<p><label for="token">Freshbooks Token:</label><input type="text" id="token" name="token" /></p>
+							</form>
+							<div id="freshbooks-import-status">
+							</div>
+							<div id="freshbooks-import-progressbar">
+							</div>
+						</div>
+					</div>
+					<div id="contact-maps" class="ui-tabs-hide">
+						<div id="contact-maps-info" class="info ui-state-highlight ui-corner-all">
+							<p>
+								<span><img src="{{ MEDIA_URL }}images/blue-dot.png" /></span><span>Cities where there is at least one Contact</span>
+								<span style="margin-left: 20px;"><img src="{{ MEDIA_URL }}images/yellow-dot.png" /></span><span>Contacts</span>
+								<span style="margin-left: 160px;">Showing <strong>{{ object_list|length }}</strong> Contacts, Page <strong>{{ page }}</strong> from <strong>{{ pages }}</strong> </span>
+							</p>
+						</div>
+						<div id='map'></div>
+					</div>
+{% endblock %}

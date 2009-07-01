@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" xml:lang="{% firstof LANGUAGE_CODE 'en' %}" lang="{% firstof LANGUAGE_CODE 'en' %}">
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		{% block css %}
+		<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/style.css" />
+		{% endblock %}
+		
+		{% if USE_JS_CDN %}
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+		<script type="text/javascript">
+			//<![CDATA[
+			if (typeof jQuery === 'undefined') {
+				document.writeln('<scr' + 'ipt type="text/javascr' + 'ipt" src="{{ MEDIA_URL }}js/jquery.min.js">' + '</scr' + 'ipt>');
+			}
+			//]]>
+		</script>
+		<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/redmond/jquery-ui.css">
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+		<script type="text/javascript">
+			//<![CDATA[
+			if (typeof jQuery.ui === 'undefined') {
+				document.writeln('<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/jquery.ui/redmond/jquery-ui.css">');
+				document.writeln('<scr' + 'ipt type="text/javascr' + 'ipt" src="{{ MEDIA_URL }}js/jquery-ui.min.js">' + '</scr' + 'ipt>');
+			}
+			//]]>
+		</script>
+		{% else %}
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/jquery.ui/redmond/jquery-ui.css">
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui.min.js"></script>
+		{% endif %}
+		
+		<script type="text/javascript">
+			//<![CDATA[
+			if(!Array.indexOf){
+				Array.prototype.indexOf = function(obj){
+					for(var i=0; i<this.length; i++){
+						if(this[i]==obj){
+							return i;
+						}
+					}
+					return -1;
+				}
+			}
+			
+			// Set up the effects of the jquery ui buttons on DOM load
+			$(function(){
+				$('.link-button')
+				.hover(
+					function() {
+						$(this).addClass('ui-state-hover');
+					},
+					function() {
+						$(this).removeClass('ui-state-hover');
+					}
+				)
+				.focus(function() {
+					$(this).addClass('ui-state-focus');
+				})
+				.blur(function() {
+					$(this).removeClass('ui-state-focus');
+				});
+			});
+			//]]>
+		</script>
+		
+		{% block js %}{% endblock %}
+	</head>
+	
+	<body>
+		<div id="main">
+			<div id="header" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+				<div id="header-content" class="ui-widget-header ui-helper-reset ui-helper-clearfix ui-corner-all">
+						<div id="header-links">
+							<a href="/" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-home"></span>Home</a>
+							<a href="{% url contactmaps.views.list_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-person"></span>Contacts &amp; Maps</a>
+							<a href="#" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-info"></span>About</a>
+						</div>
+						<div id="login-info">
+							{% if user.is_authenticated %}
+							<p id="header-welcome-msg">Welcome, <span>{{ user.username }}</span></p>
+							<a href="{% url contactmaps.views.logout %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-extlink"></span>Logout</a>
+							{% else %}
+							<a href="{% url django.contrib.auth.views.login %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-key"></span>Login</a>
+							{% endif %}
+						</div>
+				</div>
+			</div>
+			
+			<div id="content">
+			{% block content %}{% endblock content %}
+			</div>
+			
+			<div id="footer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+					<div id="footer-content" class="ui-widget-header ui-helper-reset ui-helper-clearfix ui-corner-all">
+						<a href="http://www.gocipher.com" target="_blank" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-lightbulb"></span>by GOcipher</a>
+					</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,292 @@
+body {
+	font-family:"Arial","Helvetica","Verdana", sans-serif;
+	font-size:12px;
+	margin:0;
+	padding:0;
+}
+
+.error, .info {
+	padding: 0px 0.7em;
+	margin-bottom: 10px;
+}
+
+.error span.ui-icon, .info span.ui-icon {
+	margin-right: 0.3em;
+	float: left;
+}
+
+#main {
+	font-size: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 960px;
+	padding: 5px;
+}
+
+.link-button {
+	padding: 0.4em 1em 0.4em 20px;
+	position: relative;
+	text-decoration: none;
+}
+
+.link-button span.ui-icon {
+	left: 0.2em;
+	margin: -8px 5px 0 0;
+	position: absolute;
+	top: 50%;
+}
+
+#header-content, #footer-content {
+	padding: 10px;
+}
+
+#header-links, .pagination-previous {
+	float:left;
+}
+
+#login-info, .pagination-next {
+	float:right;
+}
+
+#header-welcome-msg {
+	display: inline;
+	font-weight: normal;
+	margin-right: 10px;
+}
+
+#header-welcome-msg span {
+	font-weight: bold;
+}
+
+#content, #footer {
+	margin-top: 1em;
+}
+
+#content h1 {
+	text-align: center;
+}
+
+#content-main {
+	width: auto;
+	padding: 20px;
+	min-height: 420px;
+}
+
+#footer-content {
+	text-align: center;
+}
+
+.icon-paragraph {
+	margin-left: 150px;
+	margin-top: 0px;
+	margin-bottom: 1em;
+	font-size: 150%;
+	padding: 1em 0em 0em;
+	padding-left: 40px;
+}
+
+#store-contacts {
+	background:transparent url(../images/contacts.png) no-repeat scroll left bottom;
+}
+
+#import-freshbooks {
+	background:transparent url(../images/freshbooks.png) no-repeat scroll left bottom;
+}
+
+#google-maps {
+	padding-left: 110px;
+	background:transparent url(../images/google-maps.png) no-repeat scroll left bottom;
+}
+
+#get-started {
+	text-align: center;
+	margin-top: 2em;
+}
+
+#get-started p {
+	text-align: inherit;
+	font-size: 150%;
+	color: #2E6E9E;
+}
+
+
+/**/
+
+#contact-data, #contact-maps {
+	height: 640px;
+	min-height: 640px;
+}
+
+#contact-maps p {
+	margin: 0px;
+}
+
+.content-toolbar {
+	text-align: center;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+#contact-listing {
+	font-size: 0.7em;
+}
+
+#contact-listing .contact-listing-action {
+	color: #950000;
+}
+
+#delete-contacts {
+	margin-top: 100px;
+}
+
+#delete-contacts span.ui-icon {
+	margin-top: 0.5em;
+}
+
+#delete-contacts button.link-button {
+	margin-left: 1em;
+}
+
+#no-contacts {
+	margin-top: 200px;
+	margin-left: 150px;
+	margin-right: 150px;
+}
+
+#contact-add, #contact-detail, #contact-delete {
+	padding:1em 1.4em;
+	min-height: 420px;
+}
+
+.content-form input, .content-formt select, .content-form textarea {
+	font-family: inherit;
+	-moz-border-radius: 4px;
+	border: 1px solid black;
+	height: 1.2em;
+	padding: 0.4em;
+	width: 60%;
+}
+
+.content-form button {
+	display: inline;
+	padding: 0.4em 1em 0.4em 1em;
+}
+
+.content-form p.form-buttons {
+	text-align: right;
+}
+
+.content-form p.form-title {
+	font-size: 200%;
+	text-align: center;
+	font-weight: bold;
+}
+
+.content-form p.form-row {
+	border-bottom-style: dashed;
+	border-bottom-width: 1px;
+	padding-bottom: 15px;
+}
+
+.content-form label {
+	float: left;
+	width: 30%;
+	text-align: right;
+	margin-right: 10px;
+	padding:0.4em 0.5em 0 0;
+	font-weight: bold;
+}
+
+.content-form label.error {
+	float: none;
+	width: auto;
+	text-align: left;;
+	margin-right: 0px;
+	padding: 0px;
+	font-weight: normal;
+	margin-left: 40%;
+	color: red;
+}
+
+.content-form {
+	font-size: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 400px;
+	padding: 5px;
+}
+
+.content-form ul.errorlist {
+	list-style: none;
+	text-align: center;
+	color: red;
+}
+
+.content-form input.readonly {
+	background-color: #B0C4DE;
+}
+
+#freshbooks-import {
+	display: none;
+}
+
+#freshbooks-import-form {
+	font-size: 100%;
+}
+
+#freshbooks-import-form #username {
+	width: 240px;
+}
+
+#freshbooks-import-form label {
+	float: left;
+	width: 30%;
+	text-align: right;
+	margin-right: 10px;
+	padding:0.4em 0.5em 0 0;
+	font-weight: bold;
+}
+
+#freshbooks-import-form input, #freshbooks-import-form select, #freshbooks-import-form textarea {
+	font-family: inherit;
+	-moz-border-radius: 4px;
+	border: 1px solid black;
+	height: 1.2em;
+	padding: 0.4em;
+	width: 60%;
+}
+
+#freshbooks-import-status {
+	height: 1.1em;
+	font-weight: bold;
+	font-size: 0.8em;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+#freshbooks-import-progressbar {
+	height: 1.5em;
+	visibility: hidden;
+}
+
+/*** Google Maps Styles ***/
+
+#map{
+	width:900px;
+	height:600px;
+	border:1px solid;
+	float:left;
+	margin-left:10px;
+}
+
+.infoMap1{
+	color:#CC0000;
+	font-size:14px; 
+	font-weight:bold; 
+	font-family:trebuchet ms;
+}
+.infoMap2{
+	color:#666666; 
+	font-size:14px; 
+	font-family:trebuchet ms;
+}

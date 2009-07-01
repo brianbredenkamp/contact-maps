@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}Edit Contact{% else %}Add Contact{% endif %}{% endblock %}
+{% block js %}
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.validate.min.js"></script>
+		<script type="text/javascript">
+			//<![CDATA[
+			var requiredFields = ['id_name', 'id_company', 'id_address', 'id_city', 'id_state', 'id_country'];
+			
+			// Form enhancements
+			$(function(){
+				// Add dashed borders
+				$('.content-form p').each(function(){
+					if ( !$(this).hasClass('form-title') && !$(this).hasClass('form-buttons') ) {
+						!$(this).addClass('form-row');
+					}
+				});
+				
+				// Set up required fields and form validation
+				$.each(requiredFields, function(){
+					$('#' + this).addClass('required');
+				});
+				$('#add-contact-form').validate();
+			});
+			//]]>
+		</script>
+{% endblock %}
+{% block content %}
+				<div id="contact-add" class="ui-widget ui-widget-content ui-corner-all">
+					{% include 'info_messages.html' %}
+					<div class="content-toolbar">
+						<a href="{% url contactmaps.views.list_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Contacts</a>
+					</div>
+					<div class="content-form">
+						<form id="add-contact-form" action="" method="post" enctype="multipart/form-data">
+							<p class="form-title">{% if object %}Edit Contact{% else %}Add Contact{% endif %}</p>
+							{{ form.as_p }}
+							<p class="form-buttons">
+								<button id="add-contact-button" class="ui-state-default ui-corner-all link-button" type="submit">{% if object %}Apply changes{% else %}Add{% endif %}</button>
+							</p>
+						</form>
+					</div>
+				</div>
+{% endblock %}

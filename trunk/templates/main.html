@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Welcome to ContactMaps!{% endblock %}
+{% block content %}
+				<div id="content-main" class="ui-widget ui-widget-content ui-corner-all">
+					<h1>Welcome to ContactMaps!</h1>
+					<p id="store-contacts" class="icon-paragraph">Store your Contacts</p>
+					<p id="import-freshbooks" class="icon-paragraph">Additionally, import your Freshbooks Clients as Contacts</p>
+					<p id="google-maps" class="icon-paragraph">Visualize the location of your Contacts using Google Maps</p>
+					
+					<div id="get-started">
+						<p>Get started!</p>
+						<a href="{% url contactmaps.views.list_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-person"></span>Contacts &amp; Maps</a>
+					</div>
+				</div>
+{% endblock %}

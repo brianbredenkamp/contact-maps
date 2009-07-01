@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}{% ifnotequal object.key 'all' %}Delete Contact{% else %}Delete All Contacts{% endifnotequal %}{% endblock %}
+{% block content %}
+				<div id="contact-delete" class="ui-widget ui-widget-content ui-corner-all">
+					<div class="content-toolbar">
+						<a href="{% url contactmaps.views.list_contacts %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Contacts</a>
+						{% ifnotequal object.key 'all' %}
+						<a href="{% url contactmaps.views.show_contact key=object.key %}" class="ui-state-default ui-corner-all link-button"><span class="ui-icon ui-icon-contact"></span>Contact Details</a>
+						{% endifnotequal %}
+					</div>
+					<form action="" method="post">
+						<div id="delete-contacts" class="info ui-state-highlight ui-corner-all"><p><span class="ui-icon ui-icon-alert"></span><strong>Warning: </strong>Do you really want to delete <strong>{{ object.name|escape }}</strong>? <button class="ui-state-default ui-corner-all link-button" type="submit">Delete</button></p></div>
+					</form>
+				</div>
+{% endblock %}
