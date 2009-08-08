@@ -251,11 +251,11 @@ def import_contacts_setup(request, page):
         'retry': True| False (Whether the frontend app should retry)    
       }
     
-    In case of success, this view returns the followin json response::
+    In case of success, this view returns the following json response::
       {
         'success': True,
-        'contacts': contacts,
-        'keepProcessing': keep_processing
+        'contacts': [1,2,3,n],
+        'keepProcessing': True|False
       }
     """    
     # Ensure that the username and token are valid
